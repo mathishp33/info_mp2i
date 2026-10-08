@@ -2,13 +2,13 @@
 #include <stdlib.h>
 
 
-struct Ptr {
+typedef struct {
     int* ptr;
-};
+} Ptr;
 
 
-struct Ptr my_malloc(long unsigned int size) {
-    struct Ptr ptrs = Ptr();
+Ptr my_malloc(long unsigned int size) {
+    Ptr ptrs;
     if (!size) {
         ptrs.ptr = NULL;
         return ptrs;
@@ -24,23 +24,23 @@ struct Ptr my_malloc(long unsigned int size) {
 }
 
 int check_ptr(Ptr ptr) {
-    if (ptr == NULL) {
+    if (ptr.ptr == NULL) {
         printf("NULL PTR");
         return 0;
     }
     return 1;
 }
 
-void get_ref(Ptr ptr) {
+int* get_ref(Ptr ptr) {
     return ptr.ptr;
 }
 
-void free(Ptr ptr) {
-    if (ptr == NULL) {
+void my_free(Ptr ptr) {
+    if (ptr.ptr == NULL) {
         printf("NULL PTR");
         return ;
     }
-    free(ptr);
+    free(ptr.ptr);
 }
 
 int main() {
