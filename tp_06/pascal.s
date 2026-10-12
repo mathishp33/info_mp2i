@@ -1,178 +1,323 @@
 	.file	"pascal.c"
 	.text
+	.p2align 4
 	.globl	fact
 	.type	fact, @function
 fact:
-.LFB0:
+.LFB23:
 	.cfi_startproc
 	endbr64
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	%edi, -20(%rbp)
-	movl	$1, -8(%rbp)
-	movl	$1, -4(%rbp)
-	jmp	.L2
+	testl	%edi, %edi
+	jle	.L4
+	leal	1(%rdi), %esi
+	andl	$1, %edi
+	movl	$1, %eax
+	movl	$1, %edx
+	je	.L3
+	movl	$2, %eax
+	cmpl	%esi, %eax
+	je	.L1
+	.p2align 4,,10
+	.p2align 3
 .L3:
-	movl	-8(%rbp), %eax
-	imull	-4(%rbp), %eax
-	movl	%eax, -8(%rbp)
-	addl	$1, -4(%rbp)
-.L2:
-	movl	-20(%rbp), %eax
-	cmpl	-4(%rbp), %eax
-	jge	.L3
-	movl	-8(%rbp), %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	imull	%eax, %edx
+	leal	1(%rax), %ecx
+	addl	$2, %eax
+	imull	%ecx, %edx
+	cmpl	%esi, %eax
+	jne	.L3
+.L1:
+	movl	%edx, %eax
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L4:
+	movl	$1, %edx
+	movl	%edx, %eax
 	ret
 	.cfi_endproc
-.LFE0:
+.LFE23:
 	.size	fact, .-fact
+	.p2align 4
 	.globl	binom
 	.type	binom, @function
 binom:
-.LFB1:
+.LFB24:
 	.cfi_startproc
 	endbr64
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	pushq	%r12
-	pushq	%rbx
-	subq	$8, %rsp
-	.cfi_offset 12, -24
-	.cfi_offset 3, -32
-	movl	%edi, -20(%rbp)
-	movl	%esi, -24(%rbp)
-	cmpl	$0, -20(%rbp)
-	jle	.L6
-	cmpl	$0, -24(%rbp)
-	jg	.L7
-.L6:
-	movl	$0, %eax
-	jmp	.L8
-.L7:
-	movl	-20(%rbp), %eax
-	movl	%eax, %edi
-	call	fact
-	movl	%eax, %ebx
-	movl	-24(%rbp), %eax
-	movl	%eax, %edi
-	call	fact
-	movl	%eax, %r12d
-	movl	-20(%rbp), %eax
-	subl	-24(%rbp), %eax
-	movl	%eax, %edi
-	call	fact
-	movl	%r12d, %edx
-	imull	%eax, %edx
-	movl	%edx, %ecx
-	movl	%ebx, %eax
+	testl	%edi, %edi
+	jle	.L18
+	testl	%esi, %esi
+	jle	.L18
+	leal	-1(%rdi), %eax
+	movl	$2, %edx
+	andl	$1, %eax
+	movl	%eax, %ecx
+	movl	$1, %eax
+	cmpl	$2, %edi
+	jl	.L38
+	testl	%ecx, %ecx
+	je	.L14
+	movl	$2, %eax
+	movl	$3, %edx
+	cmpl	$3, %edi
+	jl	.L38
+	.p2align 4,,10
+	.p2align 3
+.L14:
+	imull	%edx, %eax
+	leal	1(%rdx), %ecx
+	addl	$2, %edx
+	imull	%ecx, %eax
+	cmpl	%edx, %edi
+	jge	.L14
+.L38:
+	leal	-1(%rsi), %edx
+	movl	$1, %ecx
+	andl	$1, %edx
+	movl	%edx, %r8d
+	movl	$2, %edx
+	cmpl	$2, %esi
+	jl	.L39
+	testl	%r8d, %r8d
+	je	.L15
+	movl	$2, %ecx
+	movl	$3, %edx
+	cmpl	$3, %esi
+	jl	.L39
+	.p2align 4,,10
+	.p2align 3
+.L15:
+	imull	%edx, %ecx
+	leal	1(%rdx), %r8d
+	addl	$2, %edx
+	imull	%r8d, %ecx
+	cmpl	%edx, %esi
+	jge	.L15
+.L39:
+	subl	%esi, %edi
+	testl	%edi, %edi
+	jle	.L16
+	leal	1(%rdi), %r8d
+	andl	$1, %edi
+	movl	$1, %edx
+	movl	$1, %esi
+	je	.L17
+	movl	$2, %edx
+	cmpl	$2, %r8d
+	je	.L41
+	.p2align 4,,10
+	.p2align 3
+.L17:
+	imull	%edx, %esi
+	leal	1(%rdx), %edi
+	addl	$2, %edx
+	imull	%edi, %esi
+	cmpl	%edx, %r8d
+	jne	.L17
+.L41:
+	imull	%esi, %ecx
+.L16:
 	cltd
 	idivl	%ecx
-.L8:
-	addq	$8, %rsp
-	popq	%rbx
-	popq	%r12
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L18:
+	xorl	%eax, %eax
 	ret
 	.cfi_endproc
-.LFE1:
+.LFE24:
 	.size	binom, .-binom
-	.section	.rodata
+	.section	.rodata.str1.1,"aMS",@progbits,1
 .LC0:
 	.string	"1  "
 .LC1:
 	.string	"%d  "
 	.text
+	.p2align 4
 	.globl	triangle_pascal
 	.type	triangle_pascal, @function
 triangle_pascal:
-.LFB2:
+.LFB25:
 	.cfi_startproc
 	endbr64
-	pushq	%rbp
+	pushq	%r15
 	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	subq	$32, %rsp
-	movl	%edi, -20(%rbp)
-	movl	%esi, -24(%rbp)
-	cmpl	$0, -24(%rbp)
-	jle	.L15
-	movl	-20(%rbp), %eax
-	cmpl	-24(%rbp), %eax
-	jg	.L16
-	leaq	.LC0(%rip), %rax
-	movq	%rax, %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	movl	$1, -4(%rbp)
-	jmp	.L13
-.L14:
-	movl	-4(%rbp), %edx
-	movl	-20(%rbp), %eax
-	movl	%edx, %esi
-	movl	%eax, %edi
-	call	binom
-	movl	%eax, %esi
-	leaq	.LC1(%rip), %rax
-	movq	%rax, %rdi
-	movl	$0, %eax
-	call	printf@PLT
-	addl	$1, -4(%rbp)
-.L13:
-	movl	-4(%rbp), %eax
-	cmpl	-20(%rbp), %eax
-	jle	.L14
+	.cfi_offset 15, -16
+	pushq	%r14
+	.cfi_def_cfa_offset 24
+	.cfi_offset 14, -24
+	pushq	%r13
+	.cfi_def_cfa_offset 32
+	.cfi_offset 13, -32
+	pushq	%r12
+	.cfi_def_cfa_offset 40
+	.cfi_offset 12, -40
+	pushq	%rbp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 6, -48
+	pushq	%rbx
+	.cfi_def_cfa_offset 56
+	.cfi_offset 3, -56
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 80
+	movl	%esi, 12(%rsp)
+	cmpl	%edi, %esi
+	jl	.L42
+	testl	%esi, %esi
+	movl	%edi, %ebx
+	leal	1(%rdi), %edi
+	setle	%al
+	movl	%edi, 8(%rsp)
+	movl	%edi, %r14d
+	leaq	.LC1(%rip), %rbp
+	testb	%al, %al
+	jne	.L42
+	.p2align 4,,10
+	.p2align 3
+.L53:
+	xorl	%eax, %eax
+	leaq	.LC0(%rip), %rsi
+	movl	$2, %edi
+	call	__printf_chk@PLT
+	testl	%ebx, %ebx
+	jle	.L45
+	movl	%ebx, %edi
+	movl	$2, %r13d
+	.p2align 4,,10
+	.p2align 3
+.L46:
+	movl	$1, %ecx
+	movl	$1, %eax
+	testb	$1, %r14b
+	jne	.L47
+	movl	$2, %ecx
+	cmpl	%r14d, %ecx
+	je	.L77
+	.p2align 4,,10
+	.p2align 3
+.L47:
+	imull	%ecx, %eax
+	leal	1(%rcx), %edx
+	addl	$2, %ecx
+	imull	%edx, %eax
+	cmpl	%r14d, %ecx
+	jne	.L47
+.L77:
+	movl	$1, %ecx
+	movl	$1, %esi
+	movl	%r13d, %r15d
+	testb	$1, %r13b
+	jne	.L48
+	movl	$2, %ecx
+	cmpl	%r13d, %ecx
+	je	.L76
+	.p2align 4,,10
+	.p2align 3
+.L48:
+	imull	%ecx, %esi
+	leal	1(%rcx), %edx
+	addl	$2, %ecx
+	imull	%edx, %esi
+	cmpl	%r13d, %ecx
+	jne	.L48
+.L76:
+	leal	-1(%rdi), %r12d
+	testl	%r12d, %r12d
+	jle	.L49
+	movl	$1, %edx
+	movl	$1, %r10d
+	testb	$1, %dil
+	jne	.L50
+	movl	$2, %edx
+	cmpl	$2, %edi
+	je	.L75
+	.p2align 4,,10
+	.p2align 3
+.L50:
+	imull	%edx, %r10d
+	leal	1(%rdx), %r11d
+	addl	$2, %edx
+	imull	%r11d, %r10d
+	cmpl	%edx, %edi
+	jne	.L50
+.L75:
+	imull	%r10d, %esi
+.L49:
+	cltd
+	movl	$2, %edi
+	addl	$1, %r13d
+	idivl	%esi
+	movq	%rbp, %rsi
+	movl	%eax, %edx
+	xorl	%eax, %eax
+	call	__printf_chk@PLT
+	cmpl	%ebx, %r15d
+	jg	.L51
+	movl	%r12d, %edi
+	jmp	.L46
+	.p2align 4,,10
+	.p2align 3
+.L51:
 	movl	$10, %edi
+	addl	$1, %r14d
 	call	putchar@PLT
-	addl	$1, -20(%rbp)
-	movl	-24(%rbp), %edx
-	movl	-20(%rbp), %eax
-	movl	%edx, %esi
-	movl	%eax, %edi
-	call	triangle_pascal
-	jmp	.L9
-.L15:
-	nop
-	jmp	.L9
-.L16:
-	nop
-.L9:
-	leave
-	.cfi_def_cfa 7, 8
+	movl	8(%rsp), %eax
+	movl	%eax, %ebx
+	cmpl	%eax, 12(%rsp)
+	jl	.L42
+.L54:
+	movl	8(%rsp), %eax
+	addl	$1, %eax
+	movl	%eax, 8(%rsp)
+	jmp	.L53
+.L42:
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 56
+	popq	%rbx
+	.cfi_def_cfa_offset 48
+	popq	%rbp
+	.cfi_def_cfa_offset 40
+	popq	%r12
+	.cfi_def_cfa_offset 32
+	popq	%r13
+	.cfi_def_cfa_offset 24
+	popq	%r14
+	.cfi_def_cfa_offset 16
+	popq	%r15
+	.cfi_def_cfa_offset 8
 	ret
+.L45:
+	.cfi_restore_state
+	movl	$10, %edi
+	addl	$1, %r14d
+	call	putchar@PLT
+	movl	8(%rsp), %ebx
+	jmp	.L54
 	.cfi_endproc
-.LFE2:
+.LFE25:
 	.size	triangle_pascal, .-triangle_pascal
+	.section	.text.startup,"ax",@progbits
+	.p2align 4
 	.globl	main
 	.type	main, @function
 main:
-.LFB3:
+.LFB26:
 	.cfi_startproc
 	endbr64
-	pushq	%rbp
+	subq	$8, %rsp
 	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
 	movl	$12, %esi
 	movl	$1, %edi
 	call	triangle_pascal
-	movl	$0, %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	xorl	%eax, %eax
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
 	ret
 	.cfi_endproc
-.LFE3:
+.LFE26:
 	.size	main, .-main
 	.ident	"GCC: (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
 	.section	.note.GNU-stack,"",@progbits
