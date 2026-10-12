@@ -7,7 +7,7 @@ int fact(int n) {
     return f;
 }
 
-int binom(x, y) {
+int binom(int x, int y) {
     if (x <= 0 || y <= 0)
         return 0;
     return fact(x) / (fact(y) * fact(x - y));
@@ -20,11 +20,11 @@ void triangle_pascal(int x, int prof_max) {
     if (x > prof_max)
         return ;
 
-    for (int y = 1; y < x + 2; y++)
+    printf("1  ");
+    for (int y = 1; y <= x; y++)
         printf("%d  ", binom(x, y));
-    triangle_pascal(++x, prof_max);
-    
     printf("\n");
+    triangle_pascal(++x, prof_max);
 }
 
 
