@@ -1,9 +1,9 @@
 #include "../include/vector.h"
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 
 bool vector_init(Vector *v, const size_t elem_size) {
@@ -20,7 +20,7 @@ bool vector_reserve(Vector *v, const size_t new_capacity) {
     if (new_capacity <= v->capacity)
         return true;
 
-    if (new_capacity > (size_t) - 1 / sizeof(int))
+    if (new_capacity > SIZE_MAX / v->elem_size)
         return false;
 
     void *ptr = realloc(v->data, new_capacity * v->elem_size);
@@ -50,16 +50,20 @@ bool vector_push_back(Vector *v, const void *elem) {
 }
 
 bool vector_pop(Vector *v, void *out, const size_t index) {
-    if (!v->size)
-        return false;
-    if (out == NULL)
-        return false;
-    if (index >= v->size)
+    if (index >= v->size || out == NULL)
         return false;
 
-    memcpy(out, v->data + index * v->elem_size, v->elem_size);
+    unsigned char *data = v->data;
+    const size_t offset = index * v->elem_size;
+
+    memcpy(out, data + offset, v->elem_size);
+
+    const size_t remaining = v->size - index - 1;
+
+    if (remaining)
+        memmove(data + offset, data + offset + v->elem_size, remaining * v->elem_size);
+
     v->size--;
-
     return true;
 }
 
@@ -73,6 +77,10 @@ bool vector_pop_back(Vector *v) {
 
 bool vector_get(const Vector *v, const size_t index, void *out) {
     if (index >= v->size)
+        return false;
+    if (!v->size)
+        return false;
+    if (out == NULL)
         return false;
 
     memcpy(out, v->data + index * v->elem_size, v->elem_size);
