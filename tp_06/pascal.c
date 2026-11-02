@@ -8,7 +8,7 @@ int fact(int n) {
 }
 
 int binom(int x, int y) {
-    if (x <= 0 || y <= 0)
+    if (x < 0 || y < 0)
         return 0;
     return fact(x) / (fact(y) * fact(x - y));
 }
