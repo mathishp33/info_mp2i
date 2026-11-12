@@ -88,6 +88,19 @@ bool vector_get(const Vector *v, const size_t index, void *out) {
     return true;
 }
 
+bool vector_set(const Vector *v, const size_t index, void *out) {
+    if (index >= v->size)
+        return false;
+    if (!v->size)
+        return false;
+    if (out == NULL)
+        return false;
+
+    memcpy(v->data + index * v->elem_size, out, v->elem_size);
+
+    return true;
+}
+
 bool vector_front(const Vector *v, void *out) {
     return vector_get(v, 0, out);
 }

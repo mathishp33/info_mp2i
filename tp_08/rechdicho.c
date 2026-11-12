@@ -122,21 +122,23 @@ void testRechPremDicho() {
 
 /* Partie 4 */
 
+int get_idx(int T[7][6], int i) {
+    return T[i % 7][i / 6];
+}
+
 bool rechTab2DDicho(int T[7][6], int n, int p, int x) {
-    for (int i = 0; i < n; i++) {
-        int a = 0; // début
-        int b = p; // fin
-        while (b - a > 0) {
-            // invariant : b - a > 0
-            //
-            int m = (a + b) / 2; // NB : division entière
-            if (T[i][m] == x) { // valeur trouvée
-                return true;
-            } else if (T[i][m] < x) { // cherche à droite
-                a = m + 1;
-            } else { // cherche à gauche
-                b = m;
-            }
+    int a = 0; // début
+    int b = p * n; // fin
+    while (b - a > 0) {
+        // invariant : b - a > 0
+        //
+        int m = (a + b) / 2; // NB : division entière
+        if (get_idx(T, m) == x) { // valeur trouvée
+            return true;
+        } else if (get_idx(T, m) < x) { // cherche à droite
+            a = m + 1;
+        } else { // cherche à gauche
+            b = m;
         }
     }
     return false;

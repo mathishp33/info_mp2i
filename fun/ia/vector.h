@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 
-typedef struct {
+typedef struct Vector_ {
 	unsigned char *data;
     size_t size;
     size_t capacity;
@@ -23,6 +23,8 @@ bool vector_pop(Vector *v, void *out, size_t index);
 bool vector_pop_back(Vector *v);
 
 bool vector_get(const Vector *v, size_t index, void *out);
+
+bool vector_set(const Vector *v, size_t index, void *out);
 
 bool vector_front(const Vector *v, void *out);
 
