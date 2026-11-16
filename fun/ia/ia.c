@@ -2,100 +2,115 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <random.h>
 #include <limits.h>
+#include <float.h>
+#include <string.h>
 
-#include "vector.h"
-
+typedef struct Neuron_ {
+    float value;
+} Neuron;
+#define NEURON_SIZE sizeof(Neuron)
 
 typedef struct HiddenNeuron_ {
     float b;
-    Vector w;
+    float *w;
+    float w_size;
     float in;
     float out;
+    char act;
 } HiddenNeuron;
-
+#define HIDDEN_NEURON_SIZE sizeof(HiddenNeuron)
 
 
 float get_random_float() {
-    return (float)rand() / (float)FLOAT_MAX;
-
+    return (float)rand() / (float)FLT_MAX;
 }
 
-void init_hidden_neurons(Vector *ns, size_t n, siez_t cur_last_layer_size) {
-    if (n == NULL)
-        return false;
-    for (size_t i = 0; i < n; i++) {
-        HiddenNeuron hn;
-        hn.b = get_random_float(); 
-        vector_init(&hn.w, sizeof(float));
-        for (size_t j = 0; j < cur_last_layer_size; j++) {
-            vector_push_back(&hn.w, get_random_float());
+float get_random_float_10() {
+    get_random_float() * 20 - 10;
+}
+
+typedef struct HiddenLayer_ {
+    HiddenNeuron *neurons;
+    size_t hidden_size;
+
+} HiddenLayer;
+
+typedef struct NeuralNetwork_ {
+    Neuron *input_layer;
+    size_t input_layer_size;
+    HiddenLayer *hidden_layers;
+    size_t hidden_layers_size;
+    Neuron *output_layer;
+    size_t output_layer_size;
+} NeuralNetwork;
+
+typedef struct NeuralNetworkParams_ {
+    size_t input_size;
+    size_t output_size;
+    size_t hidden_layer_size;
+    size_t *hidden_neurons_size;
+    char *activation_functions;
+
+} NeuralNetworkParams;
+
+NeuralNetwork newNeuralNetwork(NeuralNetworkParams *nnp) {
+    NeuralNetwork nn;
+
+    nn.input_layer = malloc(sizeof(Neuron) * nnp->input_size);
+    Neuron n = { 0.0 };
+    for (int i = 0; i < nnp->input_size; i++)
+        memcpy(&nn.input_layer[i], &n, NEURON_SIZE);
+
+    nn.hidden_layers = malloc(sizeof(HiddenNeuron) * nnp->hidden_layer_size);
+
+    for (size_t i = 0; i  < nnp->hidden_layer_size; i++) {
+        HiddenNeuron *hln = malloc(sizeof(HiddenNeuron) * nnp->hidden_neurons_size[i]);
+        HiddenLayer hl = { &hln , nnp->hidden_neurons_size[i] };
+        for (size_t j = 0; j < nnp->hidden_neurons_size[i]; j++) {
+            HiddenNeuron hn;
+            nn.hidden_layers[i].neurons[j].b = get_random_float_10(); //ca crash ici car il faut initialiser les structs à l'interieur des arrays
+            nn.hidden_layers[i].neurons[j].act = nnp->activation_functions[i]; //ca crash ici car il faut initialiser les structs à l'interieur des arrays
+            printf("%d \n", j);
+            if (i == 0)
+                nn.hidden_layers[i].neurons[j].w_size = nnp->input_size;
+            else
+                nn.hidden_layers[i].neurons[j].w_size = nn.hidden_layers[i - 1].hidden_size;
+            for (size_t k = 0; k < nn.hidden_layers[i].neurons[j].w_size; k++)
+                nn.hidden_layers[i].neurons[j].w[k] = get_random_float_10();
         }
-
-        vector_push_back(ns, hn);
     }
-    return true;
+
+    return nn;
 }
 
-void random_hidden_neurons(HiddenNeuron *n) {
-    
+void destroyNeuralNetwork(NeuralNetwork *nn) {
+    free(nn->input_layer);
+    free(nn->hidden_layers);
 }
 
-typedef struct NeuralManager_ {
-    Vector input_layer;
-    Vector hidden_layers;
-    Vector output_layer;
+void printNeuralNetwork(NeuralNetwork *nn) {
+    printf("Input Layer : \n [");
+    for (size_t i = 0; i < nn->input_layer_size; i++) {
+        printf("%f", nn->input_layer[i].value);
+        if (i != nn->input_layer_size - 1) printf(", ");
+    }
+    printf("]\n");
 
-} NeuralManager;
-
-void init_vec_values(Vector *v, const void *value, size_t n) {
-    for (size_t i = 0; i < n; i++)
-        vector_push_back(v, value);
 }
 
 int main() {
     printf("----------  INITIALISATION  ---------- \n");
 
-    const size_t INPUT_SIZE = 1;
-    const size_t HIDDEN_LAYER_SIZE = 2;
-    const size_t HIDDEN_TOTAL_SIZE = 2;
-    const size_t OUTPUT_SIZE = 1;
+    size_t layers_size[3] = { 2, 2, 1 };
+    char act_functions[3] = { 't', 't', 't' };
+    NeuralNetworkParams nnp = { 1, 3, layers_size, act_functions };
 
-    NeuralManager nm;
-    vector_init(&nm.input_layer, sizeof(float));
-    vector_init(&nm.hidden_layers, sizeof(Vector));
-    vector_init(&nm.output_layer, sizeof(float));
-    float zero = 0.0;
-    init_vec_values(&nm.input_layer, &zero, INPUT_SIZE);
-    init_vec_values(&nm.hidden_layers, &zero, HIDDEN_TOTAL_SIZE);
-    for (size_t i = 0; i < HIDDEN_TOTAL_SIZE; i++) {
-        Vector current_hid_layer;
-        vector_get(&nm.hidden_layers, i, &current_hid_layer);
-        vector_init(&current_hid_layer, sizeof(HiddenNeuron));
-        init_hidden_neurons(&current_hid_layer, &zero, HIDDEN_LAYER_SIZE);
-        vector_set(&current_hid_layer, i, &current_hid_layer);
-    }
-    init_vec_values(&nm.output_layer, &zero, OUTPUT_SIZE);
+    NeuralNetwork nn = newNeuralNetwork(&nnp);
+    printNeuralNetwork(&nn);
+
     
-
-
-
-
-    Vector numbers;
-    vector_init(&numbers, 4);
-
-    int a = 10, b = 20, c = 30;
-    vector_push_back(&numbers, &a);
-    vector_push_back(&numbers, &b);
-    vector_push_back(&numbers, &c);
-
-    vector_pop_back(&numbers);
-
-    int value;
-    vector_get(&numbers, 1, &value);
-
-    vector_free(&numbers);
+    destroyNeuralNetwork(&nn);
 
     printf("----------  FINI  ----------\n");
 
