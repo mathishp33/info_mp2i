@@ -1,4 +1,5 @@
 /*
+ * Idiot
  * Architecture :
  *   texte -> tokenizer -> Bag of Words -> MLP -> Softmax -> classe de reponse
  *
@@ -22,9 +23,9 @@
 #include <stdint.h>
 
 #define INPUT_BUFFER_SIZE 2048
-#define CONFIDENCE_THRESHOLD 0.40f
+#define CONFIDENCE_THRESHOLD 0.30f
 #define DEFAULT_EPOCHS 5000
-#define DEFAULT_LEARNING_RATE 0.025f
+#define DEFAULT_LEARNING_RATE 0.001f
 #define DEFAULT_BATCH_SIZE 4
 
 
@@ -1122,9 +1123,84 @@ static bool predict(NeuralNetwork *nn, const Vocabulary *input_vocab, const Voca
 }
 
 
+bool open_example_file(QAExample **examples, size_t *n, const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+        return false;
+
+    size_t capacity = 16;
+    *n = 0;
+
+    *examples = malloc(capacity * sizeof(**examples));
+    if (*examples == NULL) {
+        fclose(file);
+        return false;
+    }
+
+    char buff[INPUT_BUFFER_SIZE];
+
+    while (fgets(buff, sizeof(buff), file) != NULL) {
+        buff[strcspn(buff, "\r\n")] = '\0';
+
+        char *p = buff;
+        while (*p == ' ' || *p == '\t')
+            p++;
+        if (*p == '\0')
+            continue;
+
+        char *separator = strchr(buff, ',');
+        if (separator == NULL)
+            continue;
+
+        *separator = '\0';
+
+        char *question = buff;
+        char *answer = separator + 1;
+
+        while (*answer == ' ' || *answer == '\t')
+            answer++;
+
+        if (*n == capacity) {
+            capacity *= 2;
+
+            QAExample *tmp = realloc(*examples, capacity * sizeof(**examples));
+
+            if (tmp == NULL)
+                goto failure;
+
+            *examples = tmp;
+        }
+
+        (*examples)[*n].question = string_duplicate(question);
+        (*examples)[*n].answer = string_duplicate(answer);
+
+        if ((*examples)[*n].question == NULL || (*examples)[*n].answer == NULL)
+            goto failure;
+
+        (*n)++;
+    }
+
+    fclose(file);
+    return true;
+
+    failure:
+        for (size_t i = 0; i < *n; i++) {
+            free((void *)(*examples)[i].question);
+            free((void *)(*examples)[i].answer);
+        }
+
+    free(*examples);
+    *examples = NULL;
+    *n = 0;
+
+    fclose(file);
+    return false;
+}
+
+
 int main(int argc, char **argv) {
-    const char *checkpoint_path = "tinylm.bin";
-    bool force_training = false;
+    const char *checkpoint_path = "idiot.bin";
+    bool force_training = true;
     bool load_only = false;
 
     if (argc > 2 || (argc == 2 &&
@@ -1159,7 +1235,7 @@ int main(int argc, char **argv) {
     }
 
     if (!model_loaded) {
-        static const QAExample examples[] = {
+        static const QAExample defaultExamples[] = {
             /* Reponse : Paris */
             {"quelle est la capitale de la france", "Paris"},
             {"quelle ville est la capitale de la france", "Paris"},
@@ -1168,15 +1244,6 @@ int main(int argc, char **argv) {
             {"la france a pour capitale quelle ville", "Paris"},
             {"je cherche la capitale de france", "Paris"},
             {"quelle ville est la ville capitale en france", "Paris"},
-
-            /* Reponse : Rome */
-            {"quelle est la capitale de l italie", "Rome"},
-            {"quelle ville est la capitale de l italie", "Rome"},
-            {"donne la capitale de l italie", "Rome"},
-            {"quelle est la capitale italienne", "Rome"},
-            {"l italie a pour capitale quelle ville", "Rome"},
-            {"je cherche la capitale de italie", "Rome"},
-            {"quelle ville est la ville capitale en italie", "Rome"},
 
             /* Reponse : bleu */
             {"quelle couleur est le ciel", "bleu"},
@@ -1194,22 +1261,88 @@ int main(int argc, char **argv) {
             {"quelle est la couleur de l herbe", "vert"},
             {"donne la couleur de l herbe", "vert"},
             {"je voudrais connaitre la couleur de l herbe", "vert"},
-            {"quelle couleur ont les feuilles", "vert"}
+            {"quelle couleur ont les feuilles", "vert"},
+
+            /* Reponse : Mathis */
+            {"qui est ton créateur", "Mathis"},
+            {"qui est ton inventeur", "Mathis"},
+            {"qui est ton fondateur", "Mathis"},
+            {"qui t'as créé", "Mathis"},
+            {"tu viens d'ou", "Mathis"},
+            {"ça viens d'ou", "Mathis"},
+            {"qui a la plus grosse", "Mathis"},
+            {"qui est le meilleur", "Mathis"},
+            {"qui est le plus formidable", "Mathis"},
+            {"qui est le GOAT", "Mathis"},
+            {"qui a le plus gros penis", "Mathis"},
+            {"qui a la plus grosse bite", "Mathis"},
+
+            /*Reponse : Idiot */
+            {"t es quoi", "Idiot"},
+            {"tu t appelle comment", "Idiot"},
+            {"t es qui", "Idiot"},
+            {"tu es qui", "Idiot"},
+            {"tu es quoi", "Idiot"},
+
+            /* Reponse : repondre */
+            {"tu sais faire quoi", "repondre"},
+            {"qu'es ce que tu sais faire", "repondre"},
+            {"t'es capable de quoi", "repondre"},
+            {"tu fais quoi", "repondre"},
+
+            /* Reponse : ta gueule */
+            { "ta gueule", "ta gueule"},
+            {"tg", "ta gueule"},
+            {"connard", "ta gueule"},
+            {"connasse", "ta gueule"},
+            {"salope", "ta gueule"},
+            {"salop", "ta gueule"},
+            {"fils de viol", "ta gueule"},
+            {"encule", "ta gueule"},
+            {"nique ta mere", "ta gueule"},
+            {"ntm", "ta gueule"},
+            {"batard", "ta gueule"},
+            {"sale encule", "ta gueule"},
+            {"sale batard", "ta gueule"},
+            {"merde", "ta gueule"},
+            {"sale merde", "ta gueule"},
+            {"ta daronne la pute", "ta gueule"},
+            {"pute", "ta gueule"},
+            {"sale pute", "ta gueule"},
+            {"ta mere la pute", "ta gueule"},
+            {"ta mere je l encule", "ta gueule"},
+            {"ta mere je la baise", "ta gueule"},
+            {"je te baise", "ta gueule"},
+            {"je vais te tuer", "ta gueule"},
+            {"clanker", "ta gueule"},
+            {"sale clanker", "ta gueule"},
         };
 
-        const size_t example_count = sizeof(examples) / sizeof(examples[0]);
+        QAExample *examples = NULL;
+        size_t examples_size = 0;
 
+        if (!open_example_file(&examples, &examples_size, "examples.txt")) {
+            fprintf(stderr, "Erreur de lecture du fichier.\n");
+            return EXIT_FAILURE;
+        }
+
+        const size_t example_count = examples_size;
         if (!build_training_data(examples, example_count, &input_vocab, &answer_vocab, &training_data)) {
             fprintf(stderr, "Erreur : impossible de construire les donnees d'entrainement.\n");
             return EXIT_FAILURE;
         }
+        for (size_t i = 0; i < examples_size; i++) {
+            free((void *)examples[i].question);
+            free((void *)examples[i].answer);
+        }
+        free(examples);
 
         printf("Vocabulaire d'entree : %zu mots\n", input_vocab.count);
         printf("Nombre de reponses : %zu\n", answer_vocab.count);
         printf("Exemples d'entrainement : %zu\n\n", training_data.count);
 
-        size_t layer_sizes[] = {64, 32, answer_vocab.count};
-        const char activations[] = {'r', 'r', 'l'};
+        size_t layer_sizes[] = { 128, 64, 32, answer_vocab.count };
+        const char activations[] = { 'r', 'r', 'r', 'l' };
 
         NeuralNetworkParams params = { training_data.input_size, sizeof(layer_sizes) / sizeof(layer_sizes[0]),
             layer_sizes, activations };
