@@ -24,7 +24,7 @@
 
 #define INPUT_BUFFER_SIZE 2048
 #define CONFIDENCE_THRESHOLD 0.30f
-#define DEFAULT_EPOCHS 5000
+#define DEFAULT_EPOCHS 1000
 #define DEFAULT_LEARNING_RATE 0.001f
 #define DEFAULT_BATCH_SIZE 4
 
@@ -1142,10 +1142,7 @@ bool open_example_file(QAExample **examples, size_t *n, const char *filename) {
     while (fgets(buff, sizeof(buff), file) != NULL) {
         buff[strcspn(buff, "\r\n")] = '\0';
 
-        char *p = buff;
-        while (*p == ' ' || *p == '\t')
-            p++;
-        if (*p == '\0')
+        if (buff != NULL && (buff[0] == ';' || buff[0] == ' '))
             continue;
 
         char *separator = strchr(buff, ',');
@@ -1200,7 +1197,7 @@ bool open_example_file(QAExample **examples, size_t *n, const char *filename) {
 
 int main(int argc, char **argv) {
     const char *checkpoint_path = "idiot.bin";
-    bool force_training = true;
+    bool force_training = false;
     bool load_only = false;
 
     if (argc > 2 || (argc == 2 &&
