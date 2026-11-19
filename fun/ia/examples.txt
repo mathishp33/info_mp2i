@@ -16,6 +16,31 @@ donne la couleur de l herbe, vert
 je voudrais connaitre la couleur de l herbe, vert
 quelle couleur ont les feuilles, vert
 
+comment tu vas, bien
+comment allez vous, bien
+comment vas tu, bien
+comment ça va, bien
+cv, bien
+salut ça va, bien
+
+salut, salut
+slt, salut
+bonjour, salut
+bonne soiree, salut
+bonne journee, salut
+au revoir, salut
+a plus, salut
+a bientot, salut
+
+
+ça va, oui
+tu vas bien, oui
+vous allez bien, oui
+tu es Idiot, oui
+vous etes Idiot, oui
+tu es là pour m aider, oui
+vous etes là pour m aider, oui
+
 qui est ton créateur, Mathis
 qui est ton inventeur, Mathis
 qui est ton fondateur, Mathis

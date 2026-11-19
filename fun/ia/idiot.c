@@ -25,7 +25,7 @@
 #define INPUT_BUFFER_SIZE 2048
 #define CONFIDENCE_THRESHOLD 0.30f
 #define DEFAULT_EPOCHS 1000
-#define DEFAULT_LEARNING_RATE 0.001f
+#define DEFAULT_LEARNING_RATE 0.05f
 #define DEFAULT_BATCH_SIZE 4
 
 
@@ -1271,8 +1271,6 @@ int main(int argc, char **argv) {
             {"qui est le meilleur", "Mathis"},
             {"qui est le plus formidable", "Mathis"},
             {"qui est le GOAT", "Mathis"},
-            {"qui a le plus gros penis", "Mathis"},
-            {"qui a la plus grosse bite", "Mathis"},
 
             /*Reponse : Idiot */
             {"t es quoi", "Idiot"},
